@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from 'react'
-import './App.css';
-import CardList from '../components/CardList'
-import SearchBox from '../components/SearchBox'
-import Scroll from '../components/Scroll'
-import ViewRobotsButton from '../components/ViewRobotsButton'
-import NameInput from '../components/NameInput'
-import EmailInput from '../components/EmailInput'
-import AddRobotButton from '../components/AddRobotButton'
-import validator from 'validator'
-import DeleteButton from '../components/DeleteButton'
-import UpdateButton from '../components/UpdateButton'
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import validator from 'validator';
+import AddRobotButton from '../components/AddRobotButton';
+import CardList from '../components/CardList';
+import DeleteButton from '../components/DeleteButton';
+import EmailInput from '../components/EmailInput';
 import ExportDataButton from '../components/ExportDataButton';
-import { v4 as uuidv4 } from 'uuid'
+import NameInput from '../components/NameInput';
+import Scroll from '../components/Scroll';
+import SearchBox from '../components/SearchBox';
+import UpdateButton from '../components/UpdateButton';
+import ViewRobotsButton from '../components/ViewRobotsButton';
 import { useRobotStore } from '../state/robot-store';
-import axios from 'axios'
+import './App.css';
 
 const App = () => {
   const [searchField, setSearchField] = useState("")
@@ -51,14 +51,14 @@ const App = () => {
     }))
   }, [searchField, viewRobots, nameInput, emailInput, checkedRobots, errorMessage, serverDown]);
 
-  const fetchRobots = async () => {
+  const connection = async () => {
     const ws = new WebSocket("ws://localhost:8081/");
-    const response = await axios.get('http://localhost:8080/api/resources')
+    await axios.get('http://localhost:8080/api/robots')
       .then(response => {
         response.data.forEach(robot => {
           createRobot(robot)
           ws.onmessage = (robot) => {
-            console.log(robot);
+            console.log('Message from server', robot);
           }
         })
         
@@ -66,31 +66,38 @@ const App = () => {
         setServerDown(false)
       })
       .catch(err => {
-        setErrorMessage("The server is unavailable, waiting for the server to render. Update every 3 seconds!")
+        setErrorMessage("The server is unavailable, waiting for the server to render. Update every 5 seconds!")
         setServerDown(true)
 
-        setTimeout(fetchRobots, 3000)
+        setTimeout(connection, 5000)
       })
   };
 
   useEffect(() => {
-    fetchRobots();
+    connection();
   }, []);
 
   const onAddRobot = async () => {
     if(!validator.isEmail(emailInput) || nameInput.length < 5){
       alert("The email is not valid or the name of the user is too short")
+      setEmailInput("")
+      setNameInput("")
       return ;
     }
 
-    const response = await axios.post('http://localhost:8080/api/resources', { id: uuidv4(), name: nameInput, email: emailInput })
+    await axios.post('http://localhost:8080/api/robots', { name: nameInput, email: emailInput })
       .then(response => createRobot(response.data))
       .catch(err => alert(err.response.data.message))
+
+      setEmailInput("")
+      setNameInput("")
   };
 
   const onDeleteRobot = async () => {
     if(!validator.isEmail(emailInput)){
       alert("The email of the user is not valid!");
+      setEmailInput("")
+      setNameInput("")
       return ;
     }
 
@@ -105,16 +112,21 @@ const App = () => {
 
     if(!robot) {
       alert("The email is not found!")
+      setEmailInput("")
+      setNameInput("")
       return ;
     }
 
-    await axios.delete(`http://localhost:8080/api/resources/${id}`)
+    await axios.delete(`http://localhost:8080/api/robots/${id}`)
       .then(response => deleteRobot(robot))
       .catch(err => alert(err.response.data.message))
+
+    setEmailInput("")
+    setNameInput("")
   };
 
   const onDeleteRobotEntity = async (robot) => {
-    await axios.delete(`http://localhost:8080/api/resources/${robot.id}`)
+    await axios.delete(`http://localhost:8080/api/robots/${robot.id}`)
       .then(response => deleteRobot(robot))
       .catch(err => alert(err.response.data.message))
   };
@@ -122,6 +134,8 @@ const App = () => {
   const onUpdateRobot = async () => {
     if(!validator.isEmail(emailInput) || nameInput.length < 5){
       alert("The email of the user is not valid or the name is too short!");
+      setEmailInput("")
+      setNameInput("")
       return ;
     }
 
@@ -138,12 +152,17 @@ const App = () => {
 
     if(!updatedRobot){
       alert("There is no user in the database with the provided email address!");
+      setEmailInput("")
+      setNameInput("")
       return ;
     }
 
-    const response = await axios.patch(`http://localhost:8080/api/resources/${updatedRobot.id}`, updatedRobot)
-    .then(response => updateRobot(updatedRobot))
-    .catch(err => alert(err.response.data.message))
+    await axios.patch(`http://localhost:8080/api/robots/${updatedRobot.id}`, updatedRobot)
+      .then(response => updateRobot(updatedRobot))
+      .catch(err => alert(err.response.data.message))
+
+    setEmailInput("")
+    setNameInput("")
   };
 
   const onSearchChange = (event) => {
@@ -229,3 +248,6 @@ const App = () => {
 }
 
 export default App;
+
+// TODO Minimize the code by creating a new component for the form and the list of robots
+// TODO Render the tasks for each robot in the Robots component
