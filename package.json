@@ -19,9 +19,6 @@
     "ws": "^8.16.0",
     "zustand": "^4.5.2"
   },
-  "browser": {
-    "crypto": false
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
