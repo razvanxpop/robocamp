@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getRobotsApi } from '../services/api/robots-api'
 
-export default function useRobotSearch(page, limit) {
+export default function useRobotLoad(page, limit) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [robots, setRobots] = useState([])
@@ -11,9 +11,11 @@ export default function useRobotSearch(page, limit) {
     async function fetchData(){
       setLoading(true);
       setError(false);
-  
+
       try{
-        const robots = await getRobotsApi(page, limit);
+        const user_id = localStorage.getItem("user_id");
+        console.log('user_id', user_id)
+        const robots = await getRobotsApi(user_id, page, limit);
         setRobots(prevRobots => {
           return [...new Set([...prevRobots, ...robots.map(robot => robot)])];
         });

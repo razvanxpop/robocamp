@@ -6,12 +6,14 @@ const Home = () => {
   const [goToRobots, setGoToRobots] = useState(false);
   const [goToTasks, setGoToTasks] = useState(false);
   const [goToAbout, setGoToAbout] = useState(false);
+  const [goToLogin, setGoToLogin] = useState(false);
 
   return(
     <>
       <h1>Home Page</h1>
 
-
+      <Button onClick={() => setGoToLogin(true)}>Go to Login</Button>
+      {goToLogin && <Navigate to='/login' />}
       <Button onClick={() => setGoToRobots(true)}>Go to Robots</Button>
       {goToRobots && <Navigate to='/robots' />}
       <Button onClick={() => setGoToTasks(true)}>Go to Tasks</Button>

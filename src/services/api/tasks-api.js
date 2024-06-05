@@ -35,13 +35,13 @@ export const getTasksByRobotApi = async (robotId, order, page, limit) => {
 }
 
 export const createTaskApi = async (newTask) => {
-  const reponse = await axios.post(`http://localhost:8080/api/tasks`, newTask);
+  const response = await axios.post(`http://localhost:8080/api/tasks`, newTask);
 
-  if(reponse.status !== 201){
-    throw new Error("Error creating task: ", reponse.data.message);
+  if(response.status !== 201){
+    throw new Error("Error creating task: ", response.data.message);
   } 
   
-  return reponse.data;
+  return response.data;
 }
 
 export const updateTaskApi = async (id, updatedTask) => {

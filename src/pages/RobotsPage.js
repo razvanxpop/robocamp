@@ -1,13 +1,10 @@
-import axios from 'axios';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import RobotCard from '../components/RobotCard';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import useRobotSearch from '../hooks/useRobotSearch';
-import { connection, createRobotApi, deleteRobotApi, getRobotApi, getRobotsApi, updateRobotApi } from '../services/api/robots-api';
-import ws from '../services/api/socket-connection';
-import { useRobotStore } from '../services/state/robot-store';
+import useRobotLoad from '../hooks/useRobotLoad';
+import { createRobotApi, deleteRobotApi, getRobotApi, updateRobotApi } from '../services/api/robots-api';
 import { isValidEmail } from '../utils/healpers';
 
 const RobotsPage = () => {
@@ -19,7 +16,7 @@ const RobotsPage = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(2);
 
-  const { robots, hasMore, loading, error } = useRobotSearch(page, limit);
+  const { robots, hasMore, loading, error } = useRobotLoad(page, limit);
 
   const observer = useRef()
   const lastRobotElementRef = useCallback(node => {
@@ -33,64 +30,53 @@ const RobotsPage = () => {
     if(node) observer.current.observe(node)
   }, [loading, hasMore])
 
-  const { createRobot, updateRobot, deleteRobot } = useRobotStore()
+  // useEffect(() => {
+  //   openDatabase(); // open the indexedDB database when the component mounts
+  //   window.addEventListener('online', checkDatabase) // Check the database when the browser is online
+  //   return () => window.removeEventListener('online', checkDatabase) // Clean up the event listener
+  // }, [])
 
   const onCreate = async () => {
+    if(!isValidEmail(email) || name.length < 5){
+      alert("The email of the user is not valid or the name is too short!");
+      return ;
+    }
+    
     try{
-      if(!isValidEmail(email) || name.length < 5){
-        alert("The email of the user is not valid or the name is too short!");
-        setEmail("")
-        setName("")
-        return ;
-      }
-
-      await createRobotApi({name: name, email: email})
+      const user_id = localStorage.getItem('user_id')
+      const robot = await createRobotApi({name: name, email: email, user_id: user_id})
+      console.log('created robot', robot)
     } catch(error){
-      console.log(error.messages)
+      // if(error.message === "Network Error"){
+      //   alert("The server is not responding. Please try again later!")
+      //   console.log(localStorage.getItem("offlineData"))
+      // }
+      alert(error)
     }
   }
 
-  const onUpdate = async () => {
-    if(!isValidEmail(email) || name.length < 5){
+  const onUpdate = async (id) => {
+    if(!isValidEmail(email) && name.length < 5){
       alert("The email of the user is not valid or the name is too short!");
-      setEmail("")
-      setName("")
-      return ;
-    }
-
-    let updatedRobot;
-    robots.forEach(robot => {
-      if(robot.email.toLowerCase() === email.toLowerCase()){
-        updatedRobot = {
-          "id": robot.id,
-          "name": name,
-          "email": email
-        }
-      }
-    })
-
-    if(!updatedRobot){
-      alert("There is no user in the database with the provided email address!");
-      setEmail("")
-      setName("")
       return ;
     }
 
     try {
-      const robot = await updateRobotApi(updatedRobot.id, updatedRobot);
-      updateRobot(robot);
+      let updatedRobot = await getRobotApi(id);
+      updatedRobot.name = name || updatedRobot.name;
+      updatedRobot.email = email || updatedRobot.email;
+
+      await updateRobotApi(updatedRobot.id, updatedRobot);
     }catch(error){
-      console.log(error.messages)
+      alert(error)
     }
   }
 
   const onDelete = async (id) => {
     try{
-      const response = await deleteRobotApi(id);
-      if(response)
-        deleteRobot(id);
+      await deleteRobotApi(id);
     }catch(error){
-      console.log(error.messages)
+      alert(error)
     }
   }
 
@@ -114,7 +100,7 @@ const RobotsPage = () => {
       {goToAbout && <Navigate to='/about' />}
 
       <p>
-        <Button onClick={onCreate} >Create Robot</Button>
+        <Button onClick={onCreate}>Create Robot</Button>
         <Input type="text" name="name" placeholder='Name' onChange={onNameChange}/>
         <Input type="email" name="email" placeholder='Email' onChange={onEmailChange}/>
       </p>
@@ -123,14 +109,14 @@ const RobotsPage = () => {
       {robots.map((robot, index) => {
         if(robots.length === index + 1){
           return (
-            <div ref={lastRobotElementRef}>
+            <div key={robot.id} ref={lastRobotElementRef}>
               <RobotCard
                 id={robot.id}
                 name={robot.name}
                 email={robot.email}
                 key={robot.id}
-                onUpdate={onUpdate}
-                onDelete={(id) => onDelete(id)}
+                onUpdate={() => onUpdate(robot.id)}
+                onDelete={() => onDelete(robot.id)}
               />
             </div>
           );
@@ -141,8 +127,8 @@ const RobotsPage = () => {
               name={robot.name} 
               email={robot.email} 
               key={robot.id} 
-              onUpdate={onUpdate} 
-              onDelete={onDelete}
+              onUpdate={() => onUpdate(robot.id)} 
+              onDelete={() => onDelete(robot.id)}
             />
           );
         }

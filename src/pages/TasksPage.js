@@ -3,9 +3,8 @@ import { Navigate } from 'react-router-dom';
 import TaskCard from '../components/TaskCard';
 import Button from '../components/ui/Button';
 import Input from '../components/ui/Input';
-import useTaskSearch from '../hooks/useTaskSearch';
-import { createTaskApi, deleteTaskApi, getTasksApi, updateTaskApi } from '../services/api/tasks-api';
-import { useTaskStore } from '../services/state/task-store';
+import useTaskLoad from '../hooks/useTaskLoad';
+import { createTaskApi, deleteTaskApi, getTaskApi, updateTaskApi } from '../services/api/tasks-api';
 
 const TasksPage = () => {
   const [goToHome, setGoToHome] = useState(false);
@@ -14,11 +13,10 @@ const TasksPage = () => {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("");
-  const [robotId, setRobotId] = useState("");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(1);
 
-  const { tasks, hasMore, loading, error } = useTaskSearch(page, limit);
+  const { tasks, hasMore, loading, error } = useTaskLoad(page, limit);
 
   const observer = useRef()
   const lastTaskElementRef = useCallback(node => {
@@ -44,39 +42,33 @@ const TasksPage = () => {
     setStatus(event.target.value)
   }
 
-  const onRobotIdChange = (event) => {
-    setRobotId(event.target.value)
-  }
-
-  
-  const { createTask, updateTask, deleteTask } = useTaskStore();
-
   const onCreate = async () => {
-    const task = {
-      "name": name,
-      "description": description,
-      "status": status,
-      "robotid": robotId
+    if(name.length === 0 || description.length === 0 || status.length === 0){
+      alert("Please fill all the fields!")
+      return ;
     }
+
     try{
-      const result = await createTaskApi(task)
-      createTask(result)
+      const user_id = localStorage.getItem('user_id')
+      console.log('user_id task', user_id)
+      await createTaskApi({name: name, description: description, status: status, user_id: user_id})
     } catch(err){
       console.log(err)
     }
   }
 
   const onUpdate = async (id) => {
-    const updatedTask = {
-      "name": name,
-      "description": description,
-      "status": status,
-      "robotid": robotId
+    if(name.length === 0 && description.length === 0 && status.length === 0){
+      alert("Please fill all the fields!")
     }
 
     try{
-      const task = await updateTaskApi(id, updatedTask)
-      updateTask(task)
+      let updatedTask = await getTaskApi(id)
+      updatedTask.name = name || updatedTask.name
+      updatedTask.description = description || updatedTask.description
+      updatedTask.status = status || updatedTask.status
+
+      await updateTaskApi(id, updatedTask)
     } catch(err){
       console.log(err)
     }
@@ -85,7 +77,6 @@ const TasksPage = () => {
   const onDelete = async (id) => {
     try{
       await deleteTaskApi(id)
-      deleteTask(id)
     } catch(err){
       console.log(err)
     }
@@ -94,7 +85,6 @@ const TasksPage = () => {
   return(
     <>
       <h1>Tasks Page</h1>
-      
 
       <Button onClick={() => setGoToHome(true)}>Go to Home</Button>
       {goToHome && <Navigate to='/' />}
@@ -109,19 +99,20 @@ const TasksPage = () => {
       <Input type="text" placeholder="Task Name" onChange={onNameChange}/>
       <Input type="text" placeholder="Task Description" onChange={onDescriptionChange}/>
       <Input type="text" placeholder="Task Status" onChange={onStatusChange}/>
-      <Input type="text" placeholder="Task Robot Id" onChange={onRobotIdChange}/>
 
-      
+      <br/>
+
       {tasks.map((task, index) => {
         if(tasks.length === index + 1){
           return (
-            <div ref={lastTaskElementRef}>
+            <div key={task.id} ref={lastTaskElementRef}>
               <TaskCard 
-                key={task.id} id={task.id} 
+                key={task.id} 
+                id={task.id} 
                 name={task.name} 
                 description={task.description} 
                 status={task.status} 
-                robotId={task.robotid}
+                robotId={task.robot_id}
                 onUpdate={() => onUpdate(task.id)}
                 onDelete={() => onDelete(task.id)}
               />
@@ -129,19 +120,20 @@ const TasksPage = () => {
           );
         } else {
           return (
-            <TaskCard 
-              ref={lastTaskElementRef} 
-              key={task.id} id={task.id} 
+            <TaskCard  
+              key={task.id} 
+              id={task.id} 
               name={task.name} 
               description={task.description} 
               status={task.status} 
-              robotId={task.robotid}
+              robotId={task.robot_id}
               onUpdate={() => onUpdate(task.id)}
               onDelete={() => onDelete(task.id)}
             />
           );
         }
       })}
+
       <div>{loading && 'Loading...'}</div>
       <div>{error && 'Error'}</div>
     </>
