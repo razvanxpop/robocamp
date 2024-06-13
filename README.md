@@ -1,70 +1,115 @@
-# Getting Started with Create React App
+# RoboCamp
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+RoboCamp is a web application that allows users to create and manage robots, and assign tasks to these robots. The application supports full CRUD operations for both users and robots, with in-memory storage for the development phase and server-side persistence for production. The application also includes user authentication, pagination, and real-time updates through web sockets.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- User Registration and Login
+- Authentication with Token-Based Session Management
+- CRUD Operations for Users, Robots, and Tasks
+- Pagination for List Endpoints
+- Real-Time Updates with Web Sockets
+- Comprehensive Testing Suite
+- Server-Side Validation
+- Security Measures (SQL Injection Prevention, DDOS Mitigation, XSS Protection)
+- Backend Deployment on AWS
 
-### `npm start`
+## Repositories
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Client: [RoboCamp Client](https://github.com/razvanxpop/robocamp)
+- Server: [RoboCamp Server](https://github.com/razvanxpop/robocamp-server)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js
+- npm or yarn
+- Python (for testing purposes)
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone the repositories:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```sh
+git clone https://github.com/razvanxpop/robocamp.git
+git clone https://github.com/razvanxpop/robocamp-server.git
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. Install dependencies for both client and server:
 
-### `npm run eject`
+```sh
+cd robocamp
+npm install
+cd ../robocamp-server
+npm install
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Running the Application
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+1. Start the server:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```sh
+cd robocamp-server
+npm start
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+2. Start the client:
 
-## Learn More
+```sh
+cd robocamp
+npm start
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### Running tests
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+To run the comprehensive test suite, use the following command in the server directory:
 
-### Code Splitting
+```sh
+npm test
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### API Documentation
 
-### Analyzing the Bundle Size
+The API provides endpoints for all CRUD operations for users, robots, and tasks. The endpoints are accessible via Postman or any other HTTP client.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Users
 
-### Making a Progressive Web App
+- POST /api/users - Create a new user
+- GET /api/users - Get a list of all users
+- GET /api/users/:id - Get a specific user by ID
+- PUT /api/users/:id - Update a specific user by ID
+- DELETE /api/users/:id - Delete a specific user by ID
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### Robots
 
-### Advanced Configuration
+- POST /api/robots - Create a new robot
+- GET /api/robots - Get a list of all robots
+- GET /api/robots/:id - Get a specific robot by ID
+- PUT /api/robots/:id - Update a specific robot by ID
+- DELETE /api/robots/:id - Delete a specific robot by ID
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### Tasks
+
+- POST /api/tasks - Create a new task
+- GET /api/tasks - Get a list of all tasks
+- GET /api/tasks/:id - Get a specific task by ID
+- PUT /api/tasks/:id - Update a specific task by ID
+- DELETE /api/tasks/:id - Delete a specific task by ID
+
+### Security Considerations
+
+The application includes measures to prevent common security vulnerabilities such as:
+
+- SQL Injection: Using parameterized queries and ORM features.
+- DDOS Mitigation: Implementing rate limiting and other protective measures.
+- Cross-Site Scripting (XSS): Sanitizing inputs and using secure coding practices.
 
 ### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+The backend is deployed on AWS. To deploy your own instance, follow these steps:
 
-### `npm run build` fails to minify
+- Set up an AWS account and create an EC2 instance.
+- SSH into the instance and clone the server repository.
+- Install necessary dependencies and start the server.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```sh
+git clone https://github.com/razvanxpop/robocamp-server.git
+cd robocamp-server
+npm install
+npm start
