@@ -45,6 +45,10 @@ cd ../robocamp-server
 npm install
 ```
 
+3. Set up environment variables:
+
+Create a .env file in the robocamp-server directory with the necessary configurations.
+
 ### Running the Application
 
 1. Start the server:
@@ -107,9 +111,9 @@ The application includes measures to prevent common security vulnerabilities suc
 
 ### Deployment
 
-The backend is deployed on AWS. To deploy your own instance, follow these steps:
+The backend can be deployed on any preferred platform. Follow these general steps for deployment:
 
-- Set up an AWS account and create an EC2 instance.
+- Set up your server environment (e.g., on a cloud platform like AWS, DigitalOcean, or Heroku, or on your own server).
 - SSH into the instance and clone the server repository.
 - Install necessary dependencies and start the server.
 
