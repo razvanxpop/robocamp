@@ -34,6 +34,7 @@ RoboCamp is a web application that allows users to create and manage robots, and
 ```sh
 git clone https://github.com/razvanxpop/robocamp.git
 git clone https://github.com/razvanxpop/robocamp-server.git
+```
 
 2. Install dependencies for both client and server:
 
@@ -42,6 +43,7 @@ cd robocamp
 npm install
 cd ../robocamp-server
 npm install
+```
 
 ### Running the Application
 
@@ -50,12 +52,14 @@ npm install
 ```sh
 cd robocamp-server
 npm start
+```
 
 2. Start the client:
 
 ```sh
 cd robocamp
 npm start
+```
 
 ### Running tests
 
@@ -63,6 +67,7 @@ To run the comprehensive test suite, use the following command in the server dir
 
 ```sh
 npm test
+```
 
 ### API Documentation
 
@@ -113,3 +118,5 @@ git clone https://github.com/razvanxpop/robocamp-server.git
 cd robocamp-server
 npm install
 npm start
+```
+
